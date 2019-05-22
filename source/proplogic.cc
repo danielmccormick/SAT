@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <set>
+#include <map>
+#include <vector>
 #include "proplogic.h"
 
 namespace proplogic {
@@ -128,4 +130,123 @@ void proposition::serializeInner(node *curr) {
         return;
 }
 
+void proposition::assign(const std::vector<bool> &assignments) {
+        auto listIt = variableList.begin();
+        auto assignIt = assignments.begin();
+        while (listIt != variableList.end() && assignIt != assignments.end()) {
+                *(listIt)->truth = (*assignIt);
+                *(listIt)->truthSet = true;
+                ++listIt;
+                ++assignIt;
+        }
+        if (listIt != variableList.end()) {
+                std::cout << "Warning: Assignments list too small - some variables u
+nassigned" << std::endl;
+        }
+        if (assignIt != assignments.end()) {
+                std::cout << "Warning: Assignments list too large - not all values a
+re used" << std::endl;
+        }
+        return;
+}
+
+bool proposition::eval(const std::vector<bool> &assignments) {
+        serializeVariables();
+        populateGraph(assignment); // handle assignments
+        return evalInner(getHead());
+}
+
+
+bool evalInner(node *curr) {
+        if (curr == NULL) return true;
+        else if (curr->type == VARIABLE) {
+                if (connective != "NOT") return curr->truth;
+                else return !currNorth->truth;
+        } else if (curr->type == LITERAL) {
+                return (curr->truth) // T/F _must_ not be negated, but the value instead should be.
+        } else if (type == UNARY) {
+                if (connective == "NOT") {
+                        return !evalInner(curr->lChild);
+                }
+                else { // Unknown behaviour, assume it doesn't change anything
+                        return evalInner(curr->lChild)
+                }
+
+        }
+        else if (type == BINARY) {
+                if (connective == "AND")                return (evalInner(curr->lChild) && evalInner(curr->rChild);
+                else if (connective == "OR")            return (evalInner(curr->lChild) || evalInner(curr->lChild));
+                else if (connective == "IMPLIES")       return (!evalInner(curr->lChild) || evalInner(curr->rChild));
+                else if (connective == "IFF")           return ((!evalInner(curr->lChild) && !evalInner(curr->rChild)) ||
+                                                                (evalInner(curr->lChild) && evalInner(curr->rChild)));
+                else if (connective == "XOR")           return (evalInner(curr->lChild) ^ evalInner(curr->rChild));
+        }
+        return false; // default to assuming it fails
+}
+
+proposition NNF(proposition P) {
+        NNFInner(P->head);
+        return P;
+}
+
+void NNFInner(node *currNode) {
+        if (currNode->type = VARIABLE) return;
+        else if (currNode->type = UNARY) {
+                if (currNode->connective == "NOT") {
+                        deMorgan(currNode->lChild);
+                }
+                NNFInner(currNode->lChild);
+                return;
+        } else {
+                if (connective == "IMPLIES") {
+                        impliesToNNF(currNode);
+                } else if (connective == "IFF") {
+                        iffToNNF(currNode);
+                }
+                NNFInner(currNode->lChild);
+                NNFInner(currNode->rChild);
+        }
+        return;
+}
+
+void impliesToNNF(node *n) {
+	node *left = new node(); // (P ^ Q)
+        left->type = BINARY;
+        left->lChild = n->lChild;
+        left->rChild = n->rChild;
+        left->connective = "AND";
+
+        node *lNeg = new node(); // !P
+        lNeg->type = UNARY;
+        lNeg->lChild = n->lChild;
+        lNeg->rChild = NULL;
+        lNeg->connective = "NOT"
+
+        node *rNeg = new node(); // !Q
+	rNeg->type = UNARY;
+        rNeg->lChild = n->rChild;
+        rNeg->rChild = NULL;
+        rNeg->connective = "NOT";
+
+        node *right = new node(); // connecting the negations
+        right->type = BIANRY;
+        right->lChild = lNeg;
+        right->rChild = rNeg;
+        right->connective = "AND";
+
+        n->lChild = left;
+        n->rChild = right;
+        n->connective = "OR";
+
+        return;
+}
+
+
+void deMorgan(node *n) {
+        if (n->type == UNARY && n->connective == "NEG") return;
+        else if (n->type == OR) {
+
+        }
+}
+               
 }
