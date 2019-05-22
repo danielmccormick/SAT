@@ -1,14 +1,15 @@
-#include <stdio> 
+#include <iostream> 
 #include <string>
 #include <set>
 
 namespace proplogic
 {
-enum logicType { UNARY, BINARY, VARIABLE, LITERAL }
-enum connectiveType {AND, OR, NOT, IMPLIES, IFF, XOR, NIL } // Nil is default - (). (P) = P. ALso literal in this context is a true or false value.
+enum logicType { UNARY, BINARY, VARIABLE, LITERAL };
+enum connectiveType {AND, OR, NOT, IMPLIES, IFF, XOR, NIL }; // Nil is default - (). (P) = P. ALso literal in this context is a true or false value.
 
 class node {
-	class friend formula;
+	friend class formula;
+
 	public:
 		node();
 		node(node *, node *, const std::string &, logicType, connectiveType);
@@ -54,16 +55,16 @@ class proposition {
 		void printTraversal(); //  This is an incomplete
 		
 		node* getHead() { return head; } 
-		void setHead(const node * head_) { head = head_; }
+		void setHead(node* const head_) { head = head_; }
 	
 		void NNF(); // will convert to NNF in the future
 		bool eval(std::vector<bool>);
 	private:
-		void printInner(node *)
+		void printInner(node *);
 	
 		void serializeVariables(); // will serialize inorder. This will get all variables into the literal list
-		void serialInner(node *);
-		void assign(std::vector<bool>)
+		void serializeInner(node *);
+		void assign(const std::vector<bool> &);
 		
 		std::set<node *> variableList; 
 };

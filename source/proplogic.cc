@@ -9,7 +9,7 @@ namespace proplogic {
 
 node::node() {
         type = VARIABLE;
-        connective = NIL:
+        connective = NIL;
         truth = false;
         truthSet = false;
         name = "";
@@ -31,10 +31,10 @@ connectiveType connective_) {
 node::node(bool truth_) {
         type = LITERAL;
         connective = NIL;
-        truth = val;
+        truth = truth_;
         truthSet = true;
         lChild = NULL;
-        rChild = NULL:
+        rChild = NULL;
 }
 
 void node::printVar() {
@@ -67,11 +67,7 @@ void node::printVar() {
         return;
 }
 void node::printConnective() {
-	switch(type) {
-                case LITERAL :  std::cout << "(literal) ";
-                                break;
-                case VARIABLE : std::cout << "(variable) ";
-                                break;
+	switch(connective) {
                 case OR :       std::cout << "OR ";
                                 break;
                 case AND :      std::cout << "AND ";
@@ -96,14 +92,15 @@ void proposition::printTraversal() {
 
 void proposition::printInner(node *curr) {
         if (curr == NULL) return;
-        else if (curr->type == VARIABLE || type == LITERAL) curr->printVar();
-        else if (type == UNARY) {
+	const logicType currType = curr->getLogicType();
+        if (currType == VARIABLE || currType == LITERAL) curr->printVar();
+        else if (currType == UNARY) {
                 curr->printConnective(); // Prints the connective name
-                printInner(curr->getLChild()); // should be "Not"
-        } else if (type == BINARY) {
-                printInner(curr->getLChild());
+                printInner(curr->getlChild()); // should be "Not"
+        } else if (currType == BINARY) {
+                printInner(curr->getlChild());
                 curr->printConnective();
-                printInner(curr->getRChild());
+                printInner(curr->getrChild());
         } else {
                 std::cout << "Unknown logic type!!! Failure" << std::endl;
                 std::terminate();
@@ -121,12 +118,12 @@ void proposition::serializeVariables() {
 
 
 void proposition::serializeInner(node *curr) {
-        if (node == NULL) return;
-        serializeInner(curr->getLChild());
-        if (curr->getType() == VARIABLE && !variableList.count(curr)) {
+        if (curr == NULL) return;
+        serializeInner(curr->getlChild());
+        if (curr->getLogicType() == VARIABLE && !variableList.count(curr)) {
                 variableList.insert(curr);
         }
-        serializeInner(curr->getRChild());
+        serializeInner(curr->getrChild());
         return;
 }
 
@@ -134,18 +131,15 @@ void proposition::assign(const std::vector<bool> &assignments) {
         auto listIt = variableList.begin();
         auto assignIt = assignments.begin();
         while (listIt != variableList.end() && assignIt != assignments.end()) {
-                *(listIt)->truth = (*assignIt);
-                *(listIt)->truthSet = true;
+                (*(listIt))->setTruth(*assignIt);
                 ++listIt;
                 ++assignIt;
         }
         if (listIt != variableList.end()) {
-                std::cout << "Warning: Assignments list too small - some variables u
-nassigned" << std::endl;
+                std::cout << "Warning: Assignments list too small - some variables unassigned" << std::endl;
         }
         if (assignIt != assignments.end()) {
-                std::cout << "Warning: Assignments list too large - not all values a
-re used" << std::endl;
+                std::cout << "Warning: Assignments list too large - not all values are used" << std::endl;
         }
         return;
 }
