@@ -6,6 +6,10 @@
 #include "proplogic.h"
 
 namespace proplogic {
+void NNFInner(node*);
+void deMorgan(node*);
+void impliesToNNF(node*);
+void iffToNNF(node*);
 
 node::node() {
         type = VARIABLE;
@@ -146,99 +150,99 @@ void proposition::assign(const std::vector<bool> &assignments) {
 
 bool proposition::eval(const std::vector<bool> &assignments) {
         serializeVariables();
-        populateGraph(assignment); // handle assignments
+        assign(assignments); // handle assignments
         return evalInner(getHead());
 }
 
 
 bool evalInner(node *curr) {
         if (curr == NULL) return true;
-        else if (curr->type == VARIABLE) {
-                if (connective != "NOT") return curr->truth;
-                else return !currNorth->truth;
-        } else if (curr->type == LITERAL) {
-                return (curr->truth) // T/F _must_ not be negated, but the value instead should be.
-        } else if (type == UNARY) {
-                if (connective == "NOT") {
-                        return !evalInner(curr->lChild);
+        else if (curr->getLogicType() == VARIABLE) {
+                if (curr->getConnectiveType() != NOT) return curr->getTruth();
+                else return !curr->getTruth();
+        } else if (curr->getLogicType() == LITERAL) {
+                return (curr->getTruth()); // T/F _must_ not be negated, but the value instead should be.
+        } else if (curr->getLogicType() == UNARY) {
+                if (curr->getConnectiveType() == NOT) {
+                        return !evalInner(curr->getlChild());
                 }
                 else { // Unknown behaviour, assume it doesn't change anything
-                        return evalInner(curr->lChild)
+                        return evalInner(curr->getlChild());
                 }
 
         }
-        else if (type == BINARY) {
-                if (connective == "AND")                return (evalInner(curr->lChild) && evalInner(curr->rChild);
-                else if (connective == "OR")            return (evalInner(curr->lChild) || evalInner(curr->lChild));
-                else if (connective == "IMPLIES")       return (!evalInner(curr->lChild) || evalInner(curr->rChild));
-                else if (connective == "IFF")           return ((!evalInner(curr->lChild) && !evalInner(curr->rChild)) ||
-                                                                (evalInner(curr->lChild) && evalInner(curr->rChild)));
-                else if (connective == "XOR")           return (evalInner(curr->lChild) ^ evalInner(curr->rChild));
+        else if (curr->getLogicType() == BINARY) {
+                if (curr->getConnectiveType() == AND)                return (evalInner(curr->getlChild()) && evalInner(curr->getrChild()));
+                else if (curr->getConnectiveType() == OR)            return (evalInner(curr->getlChild()) || evalInner(curr->getrChild()));
+                else if (curr->getConnectiveType() == IMPLIES)       return (!evalInner(curr->getlChild()) || evalInner(curr->getrChild()));
+                else if (curr->getConnectiveType() == IFF)           return ((!evalInner(curr->getlChild()) && !evalInner(curr->getrChild())) ||
+                                                                (evalInner(curr->getlChild()) && evalInner(curr->getrChild())));
+                else if (curr->getConnectiveType() == XOR)           return (evalInner(curr->getlChild()) ^ evalInner(curr->getrChild()));
         }
         return false; // default to assuming it fails
 }
 
 proposition NNF(proposition P) {
-        NNFInner(P->head);
+        NNFInner(P.getHead());
         return P;
 }
 
 void NNFInner(node *currNode) {
-        if (currNode->type = VARIABLE) return;
-        else if (currNode->type = UNARY) {
-                if (currNode->connective == "NOT") {
-                        deMorgan(currNode->lChild);
+        if (currNode->getLogicType() == VARIABLE) return;
+        else if (currNode->getLogicType() == UNARY) {
+                if (currNode->getConnectiveType() == NOT) {
+                        deMorgan(currNode->getlChild());
                 }
-                NNFInner(currNode->lChild);
+                NNFInner(currNode->getlChild());
                 return;
         } else {
-                if (connective == "IMPLIES") {
+                if (currNode->getConnectiveType() == IMPLIES) {
                         impliesToNNF(currNode);
-                } else if (connective == "IFF") {
+                } else if (currNode->getConnectiveType() == IFF) {
                         iffToNNF(currNode);
                 }
-                NNFInner(currNode->lChild);
-                NNFInner(currNode->rChild);
+                NNFInner(currNode->getlChild());
+                NNFInner(currNode->getrChild());
         }
         return;
 }
 
 void impliesToNNF(node *n) {
 	node *left = new node(); // (P ^ Q)
-        left->type = BINARY;
-        left->lChild = n->lChild;
-        left->rChild = n->rChild;
-        left->connective = "AND";
+        left->setLogicType(BINARY);
+        left->setlChild(n->getlChild());
+        left->setrChild(n->getrChild());
+        left->setConnectiveType(AND);
 
         node *lNeg = new node(); // !P
-        lNeg->type = UNARY;
-        lNeg->lChild = n->lChild;
-        lNeg->rChild = NULL;
-        lNeg->connective = "NOT"
+        lNeg->setLogicType(UNARY);
+        lNeg->setlChild(n->getlChild());
+        lNeg->setrChild(NULL);
+        lNeg->setConnectiveType(NOT);
 
         node *rNeg = new node(); // !Q
-	rNeg->type = UNARY;
-        rNeg->lChild = n->rChild;
-        rNeg->rChild = NULL;
-        rNeg->connective = "NOT";
+	rNeg->setLogicType(UNARY);
+        rNeg->setlChild(n->getrChild());
+        rNeg->setrChild(NULL);
+        rNeg->setConnectiveType(NOT);
 
         node *right = new node(); // connecting the negations
-        right->type = BIANRY;
-        right->lChild = lNeg;
-        right->rChild = rNeg;
-        right->connective = "AND";
+        right->setLogicType(BINARY);
+        right->setlChild(lNeg);
+        right->setrChild(rNeg);
+        right->setConnectiveType(AND);
 
-        n->lChild = left;
-        n->rChild = right;
-        n->connective = "OR";
+        n->setlChild(left);
+        n->setrChild(right);
+        n->setConnectiveType(OR);
 
         return;
 }
 
 
 void deMorgan(node *n) {
-        if (n->type == UNARY && n->connective == "NEG") return;
-        else if (n->type == OR) {
+        if (n->getLogicType() == UNARY && n->getConnectiveType() == NOT) return;
+        else if (n->getConnectiveType() == OR) {
 
         }
 }

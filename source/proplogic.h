@@ -58,14 +58,15 @@ class proposition {
 		void setHead(node* const head_) { head = head_; }
 	
 		void NNF(); // will convert to NNF in the future
-		bool eval(std::vector<bool>);
+		bool eval(const std::vector<bool> &);
 	private:
 		void printInner(node *);
 	
 		void serializeVariables(); // will serialize inorder. This will get all variables into the literal list
 		void serializeInner(node *);
 		void assign(const std::vector<bool> &);
-		
+	
+		bool evalInner(node *);	
 		std::set<node *> variableList; 
 };
 
