@@ -13,6 +13,17 @@ namespace sat {
 	
 	template<typename T> 
 	inline T abs(const T &x) { return ((x > 0) ? x : -x); }
+	
+	class clause {
+		clause() : shortResolve(false) {};
+		clause(std::vector<int>); 
+		bool validAssignment(const std::map<int,bool> &, const bool &);
+		
+		private: 
+			std::set<int> 
+			bool shortResolve; // A & Not A
+
+	}	
 
 	// formula in NNF or CNF
 	class formula {
@@ -30,22 +41,21 @@ namespace sat {
 			void DPLL();			
 
 		private:
-			bool DNF;
-			bool autoSat;
-			
 			// Returns false if the assignment is neccesarily false
 			bool validClause(const std::map<int,bool> &assignments, int clauseNum);
 
 			// Returns false if the assignment is neccesarily false; true otherwise
 			bool validVar(const std::map<int,bool> &assignments, int var);		
 			
-			std::set<int> parseClause(const std::string &s);
+			clause parseClause(const std::string &s);
 
 
-		
+			// Error Handler	
 			void handleError(int); // Error Handler, Reserved for future use
 	
-	
+		
+			bool DNF;
+			bool autoSat;
 			std::vector<std::set<int>> formula;	
 			
 			std::set<int> pureLiterals; // For PLP, reserved for future use
