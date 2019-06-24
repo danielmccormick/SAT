@@ -15,15 +15,33 @@ namespace sat {
 	inline T abs(const T &x) { return ((x > 0) ? x : -x); }
 	
 	class clause {
-		clause() : shortResolve(false) {};
-		clause(std::vector<int>); 
-		bool validAssignment(const std::map<int,bool> &, const bool &);
-		
-		private: 
-			std::set<int> 
-			bool shortResolve; // A & Not A
+		public: 
+			clause() = delete;
+			clause(const std::vector<int> &); 
+			clause(const clause &) = default;
 
-	}	
+			// valid assignment for cnf only - to see if it's DNF sat use isDNFSat()
+			bool validAssignment(const std::map<int,bool> &);
+			
+			// is DNF Sat only - this is a lot cheaper to implement
+			bool isDNFSat() { return (!shortResolve); }
+
+			// This is a bit cryptic, but it will return true if and only if it is lways sat (ie got simplified\);
+			bool isCNFSat() { return (shortResolve || autoValid ); }
+
+			bool isUnitClause() { return (variables.size() == 1); }
+
+			int getVariable() { if (variables.size()) return abs(*variables.begin());}
+	
+			// Don't bother simplifying DNF formulas
+			void simplifyFormula(const std::map<int,bool> &);
+			
+					
+		private: 
+			std::set<int> variables;
+			bool shortResolve; // A & Not A
+			bool autoValid;
+	};
 
 	// formula in NNF or CNF
 	class formula {
@@ -47,7 +65,7 @@ namespace sat {
 			// Returns false if the assignment is neccesarily false; true otherwise
 			bool validVar(const std::map<int,bool> &assignments, int var);		
 			
-			clause parseClause(const std::string &s);
+			std::vector<int> parseClause(const std::string &s);
 
 
 			// Error Handler	
