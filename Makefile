@@ -1,5 +1,5 @@
 lib:
-	g++ -shared -fpic source/proplogic.cc -o libprop.so -std=c++11 -Wfatal-errors
+	g++ -shared -fpic source/sat.hh source/sat.cc -std=c++11 -Wall -Wextra -o sat.so
 
 .PHONY: clean
 clean: 
