@@ -1,4 +1,5 @@
 #include "sat.hh"
+#include <memory>
 #define ABS_INT_COMP [](int a, int b) -> bool { return abs(a) > abs(b); }
 
 namespace sat {
@@ -7,9 +8,7 @@ namespace sat {
 		shortResolve = false;
 		autoValid = false;
 		for (auto i : vec) {
-			if (variables.count(-i)) {
-				shortResolve = true;
-			}
+			if (variables.count(-i)) { shortResolve = true; }
 			variables.insert(i);
 		}
 		return;				
@@ -52,6 +51,7 @@ namespace sat {
 			bool clauseFound = false;	
 			std::string l;
 			try {
+				std::unique_ptr<std::set<int>> notPureLiterals = std::make_unique<std::set<int>>();
 				while (getline(file,l)) {
 					if (l.empty()) { throw 0; }
 					else if (l[0] == 'c') { }
@@ -64,8 +64,18 @@ namespace sat {
 					} else if (isNum(l[0]) || l[0] == '-') {
 						if (headerFound == false) { return false; }
 						{
-								std::vector<int> parsedClause = parseClause(l);
-								clauseFound = true;
+							std::vector<int> parsedClause = parseClause(l);
+							clauseFound = true;
+							for (auto i : parsedClause) {
+								if (!notPureLiterals->count(abs(i))) {
+									if (pureLiterals.count(-i)) {
+										pureLiterals.erase(-i);
+										notPureLiterals->insert(abs(i));
+									} else { pureLiterals.insert(i); }
+								}
+								variables.insert(abs(i));
+							}
+							formula_.push_back(clause(parsedClause));
 						}
 					}					
 				}
@@ -104,6 +114,10 @@ namespace sat {
 			idx = (idx+offset)+1;	
 		}	
 		throw 2;
+	}
+
+	std::map<int,bool> formula::PLP() {
+		return {};	
 	}
 
 	void formula::handleError(int i) {

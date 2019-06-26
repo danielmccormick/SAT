@@ -28,9 +28,11 @@ namespace sat {
 
 			// This is a bit cryptic, but it will return true if and only if it is lways sat (ie got simplified\);
 			bool isCNFSat() { return (shortResolve || autoValid ); }
-
+			
+			// For unit clause propogation
 			bool isUnitClause() { return (variables.size() == 1); }
 
+			// only call getVariable() if not sat, since otherwise it's meaningless
 			int getVariable() { if (variables.size()) return abs(*variables.begin());}
 	
 			// Don't bother simplifying DNF formulas
@@ -46,8 +48,8 @@ namespace sat {
 	// formula in NNF or CNF
 	class formula {
 		public:
-			std::vector<std::set<int>> getFormula() { return formula; }
-			void setFormula(const std::vector<std::set<int>> &formula_) { formula = formula_; }
+			std::vector<clause> getFormula() { return formula_; }
+			void setFormula(const std::vector<clause> &form) { formula_ = form; }
 
 			bool getDNF() { return DNF; }
 			void setDNF(const bool &DNF_) { DNF = DNF_; } 
@@ -55,6 +57,9 @@ namespace sat {
 			bool readFromFile(const char * &file_path);
 
 			bool validAssignment(const std::map<int,bool> &assignments);
+
+			// Do pure logic propogation
+			std::map<int,bool> PLP();			
 
 			void DPLL();			
 
@@ -74,7 +79,7 @@ namespace sat {
 		
 			bool DNF;
 			bool autoSat;
-			std::vector<std::set<int>> formula;	
+			std::vector<clause> formula_;	
 			
 			std::set<int> pureLiterals; // For PLP, reserved for future use
 			std::set<int> variables;

@@ -1,5 +1,8 @@
+FLAGS = -std=c++14 -Wall -Wextra
+FILES = source/sat.*
+
 lib:
-	g++ -shared -fpic source/sat.hh source/sat.cc -std=c++11 -Wall -Wextra -o sat.so
+	g++ -shared -fpic $(FILES)  -o sat.so $(FLAGS)
 
 .PHONY: clean
 clean: 
