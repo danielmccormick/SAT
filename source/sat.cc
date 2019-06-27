@@ -117,7 +117,12 @@ namespace sat {
 	}
 
 	std::map<int,bool> formula::PLP() {
-		return {};	
+		std::map<int,bool> assignments;
+		for (auto i : pureLiterals) {
+			if (i < 0) assignments[-i] = false;
+			else assignments[i] = true;
+		}
+		return assignments;
 	}
 
 	void formula::handleError(int i) {
@@ -141,6 +146,12 @@ namespace sat {
 			
 		}
 		return;
+	}
+
+	void formula::clear() {
+		formula_.clear();
+		pureLiterals.clear();
+		variables.clear();
 	}
 
 } ;

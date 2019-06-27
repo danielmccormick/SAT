@@ -61,7 +61,9 @@ namespace sat {
 			// Do pure logic propogation
 			std::map<int,bool> PLP();			
 
-			void DPLL();			
+			bool DPLL();		
+	
+			void clear();	
 
 		private:
 			// Returns false if the assignment is neccesarily false
@@ -79,6 +81,7 @@ namespace sat {
 		
 			bool DNF;
 			bool autoSat;
+
 			std::vector<clause> formula_;	
 			
 			std::set<int> pureLiterals; // For PLP, reserved for future use
