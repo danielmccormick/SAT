@@ -36,7 +36,7 @@ namespace sat {
 			int getVariable() { if (variables.size()) return abs(*variables.begin());}
 	
 			// Don't bother simplifying DNF formulas
-			void simplifyFormula(const std::map<int,bool> &);
+			void simplifyClause(const std::map<int,bool> &);
 			
 					
 		private: 
@@ -71,6 +71,12 @@ namespace sat {
 
 			// Returns false if the assignment is neccesarily false; true otherwise
 			bool validVar(const std::map<int,bool> &assignments, int var);		
+
+			// Inner loop for handling DPLL
+			bool DPLLInner(std::map<int,bool> &assignments);
+
+			// Simplifies variables out of formula
+			bool simplifyFormula(std::map<int,bool> &assignments);
 			
 			std::vector<int> parseClause(const std::string &s);
 

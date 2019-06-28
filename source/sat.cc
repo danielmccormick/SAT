@@ -125,6 +125,27 @@ namespace sat {
 		return assignments;
 	}
 
+	bool formula::DPLL() {
+		auto assignments = PLP();
+		try {
+					
+		
+		} catch (int err) {
+			if (err = -1) return false;
+			else handleError(i);
+			return false;
+		}
+
+	}
+
+	bool formula::DPLLInner() {
+		// TBD
+	}
+
+	void formula::simplifyFormula(const std::map<int,bool> variables) {
+
+	}
+
 	void formula::handleError(int i) {
 		switch(i) {
 			case 0: std::cout << "An error has occured! Invalid File\n";
