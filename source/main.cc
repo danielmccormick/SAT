@@ -13,7 +13,7 @@ int main(int argc, int **argv) {
 		sat::formula dimacsFormula;
 		for (unsigned int i = 1; i < argc; i++) {
 			dimacsFormula.readFromFile(argv[i]);
-			if (dimacsFormula.DPLL()) { cout << "SAT\n"; }
+			if (sat::isDPLLSat(dimacsFormula)) { cout << "SAT\n"; }
 			else { cout << "UNSAT\n"; }
 			dimacsFormula.clear();
 		}

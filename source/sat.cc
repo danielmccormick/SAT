@@ -26,7 +26,7 @@ namespace sat {
 		return false;
 	}
 
-	void clause::simplifyFormula(const std::map<int,bool> &assignments) {
+	void clause::simplifyClause(const std::map<int,bool> &assignments) {
 		for (auto i : variables) {
 			if (assignments.count(abs(i))) {
 				if ( (assignments.find(abs(i)))->second == true && i > 0) {
@@ -125,44 +125,44 @@ namespace sat {
 		return assignments;
 	}
 
-	bool formula::isDNFSat() {
+	bool formula::isDNFSat() const{
 		for (auto c : formula_) {
 			if (c.isCNFSat()) return true;
 		}
 		return false;
 	}
 
-	bool DPLLSat() {
-		auto assignments = PLP();
+	bool DPLLSat(formula &f) {
+		auto assignments = f.PLP();
 		try {
 					
 		
 		} catch (int err) {
-			if (err = -1) return false;
-			else handleError(i);
+			if (err == -1) return false;
+			else f.handleError(err);
 			return false;
 		}
-
+		return false;
 	}
 
-	bool DPLLInner() {
+	bool DPLLInner(formula f, std::map<int,bool> assignments) {
 		// TBD
 	}
 
-	bool CDCLSat() {
-
+	bool CDCLSat(formula &f) {
+		return false;
 	}
 
-	bool CDCLInner() {
-		
+	bool CDCLInner(formula f, std::map<int,bool> assignments) {
+		return false;
 	}
 
 	bool DNFSat(const formula &f) {
 		return f.isDNFSat(); // Just to allow consisteny evaluation
 	}
 
-	void formula::simplifyFormula(const std::map<int,bool> variables) {
-
+	bool formula::simplifyFormula(const std::map<int,bool> &variables) {
+		return false;
 	}
 
 	void formula::handleError(int i) {

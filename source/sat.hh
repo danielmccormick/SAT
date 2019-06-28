@@ -63,8 +63,9 @@ namespace sat {
 
 			void clear();	
 
-			bool isDNFSat() {}
+			bool isDNFSat() const;
 
+			void handleError(int);
 		private:
 			// Returns false if the assignment is neccesarily false
 			bool validClause(const std::map<int,bool> &assignments, int clauseNum);
@@ -74,15 +75,10 @@ namespace sat {
 
 
 			// Simplifies variables out of formula
-			bool simplifyFormula(std::map<int,bool> &assignments);
+			bool simplifyFormula(const std::map<int,bool> &);
 			
 			std::vector<int> parseClause(const std::string &s);
 
-
-			// Error Handler	
-			void handleError(int); // Error Handler, Reserved for future use
-	
-		
 			bool DNF;
 			bool autoSat;
 
