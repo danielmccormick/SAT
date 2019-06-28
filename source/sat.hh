@@ -61,9 +61,9 @@ namespace sat {
 			// Do pure logic propogation
 			std::map<int,bool> PLP();			
 
-			bool DPLL();		
-	
 			void clear();	
+
+			bool isDNFSat() {}
 
 		private:
 			// Returns false if the assignment is neccesarily false
@@ -72,8 +72,6 @@ namespace sat {
 			// Returns false if the assignment is neccesarily false; true otherwise
 			bool validVar(const std::map<int,bool> &assignments, int var);		
 
-			// Inner loop for handling DPLL
-			bool DPLLInner(std::map<int,bool> &assignments);
 
 			// Simplifies variables out of formula
 			bool simplifyFormula(std::map<int,bool> &assignments);
@@ -94,7 +92,13 @@ namespace sat {
 			std::set<int> variables;
 	};
 
+	bool DPLLSat(formula &);
+	bool DPLLInner(formula,std::map<int,bool>);
 
+	bool CDCLSat(formula &);
+	bool CDCLInner(formula, std::map<int,bool>);
+
+	bool DNFSat(const formula &);
 };
 
 #endif

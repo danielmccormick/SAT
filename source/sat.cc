@@ -125,7 +125,14 @@ namespace sat {
 		return assignments;
 	}
 
-	bool formula::DPLL() {
+	bool formula::isDNFSat() {
+		for (auto c : formula_) {
+			if (c.isCNFSat()) return true;
+		}
+		return false;
+	}
+
+	bool DPLLSat() {
 		auto assignments = PLP();
 		try {
 					
@@ -138,8 +145,20 @@ namespace sat {
 
 	}
 
-	bool formula::DPLLInner() {
+	bool DPLLInner() {
 		// TBD
+	}
+
+	bool CDCLSat() {
+
+	}
+
+	bool CDCLInner() {
+		
+	}
+
+	bool DNFSat(const formula &f) {
+		return f.isDNFSat(); // Just to allow consisteny evaluation
 	}
 
 	void formula::simplifyFormula(const std::map<int,bool> variables) {
