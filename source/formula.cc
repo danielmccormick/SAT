@@ -28,9 +28,20 @@ namespace sat {
 			if (assignments.count(abs(i))) {
 				if ( (assignments.find(abs(i)))->second == true && i > 0) return true;
 				if ( (assignments.find(abs(i)))->second == false && i < 0) return true;	
-			} else { return true; }
+			} else {
+				return true; 
+			}
 		}
 		return false; // No unassigned or correctly assigned variables
+	}
+
+	bool clause::isDNFSat() {
+		std::set<int> vars;
+		for (auto i : variables) {
+			if (vars.count(-i)) return false;
+			vars.insert(i);
+		}
+		return true;
 	}
 
 	/*
@@ -163,6 +174,15 @@ namespace sat {
 		return true;
 	}
 
+	int formula::getVariable() {
+		for (auto c : formula_) {
+			if (c.getSize() > 0) {
+				return c.getVar();
+			}
+		}
+		throw 10;
+	}
+
 	void handleError(int i) {
 		switch(i) {
 			case 0: std::cout << "An error has occured! Invalid File\n";
@@ -185,6 +205,5 @@ namespace sat {
 		}
 		return;
 	}
-
 
 } ;

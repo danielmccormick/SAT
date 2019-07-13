@@ -1,6 +1,3 @@
-#ifndef SAT_H
-#define SAT_H
-
 #include <set>
 #include <vector>
 #include <map>
@@ -26,6 +23,8 @@ namespace sat {
 			
 			// Only meaningful in short circuit
 			bool isCNFSat() { return autoValid; }
+
+			bool isDNFSat();
 			
 			// For unit clause propogation
 			bool isUnitClause() { return ( getSize() == 1); }
@@ -66,6 +65,8 @@ namespace sat {
 			// Takes the assignments 
 			bool validAssignment(std::map<int,bool> &);			
 			bool completeAssignment(std::map<int,bool> &);
+
+			int getVariable();
 
 			// Do pure logic propogation
 			friend std::map<int,bool> PLP(formula &);			
@@ -110,5 +111,3 @@ namespace sat {
 	void handleError(int);
 
 };
-
-#endif

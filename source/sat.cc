@@ -1,6 +1,3 @@
-#ifndef SAT_H
-#define SAT_H
-
 #include "formula.hh"
 
 #include <set>
@@ -16,12 +13,12 @@
 
 namespace sat {
 	
-	void CNFSimplify(formula &f) {
+	void CNFSimplify(sat::formula &f) {
 		for (auto c : f.formula_) {
 			std::set<int> vars;
-			for (auto i : c) {
+			for (auto i : c.variables) {
 				if (vars.count(-i)) {
-					c.clear();
+					c.variables.clear();
 					vars.clear();
 					c.setAutoValid(true);
 					break;
@@ -38,10 +35,10 @@ namespace sat {
 		std::set<int> pureLiterals;
 		std::set<int> removedLiterals;
 		
-		for (auto f: f.formula_) {
+		for (auto f: form.formula_) {
 			for(int i : f.variables) {
 				if (!(removedLiterals.count(abs(i)))) {
-					if (pureLiterals.count(-i) {
+					if (pureLiterals.count(-i)) {
 						pureLiterals.erase(-i);
 						removedLiterals.insert(abs(i));
 					} else {
@@ -54,24 +51,25 @@ namespace sat {
 		for (int i : pureLiterals) {
 			assert(i != 0 && "0 IS NOT A VALID VARIABLE"); 
 			if (i < 0) { assignments[-i] = false; }
-			else { assignments[i] = true };
+			else { assignments[i] = true; }
 		}
 		return assignments; // #Elision
 	}
 
 	void propUnitClauses(std::map<int,bool> &assignments, formula &f) {
-		std::sort(f.clauses.begin(),f.clauses.end() CLAUSE_SIZE_COMP);
+		std::sort(f.formula_.begin(),f.formula_.end(), CLAUSE_SIZE_COMP);
 		int unitVariable;
 
-		for (auto it = f.clauses.begin(); it != f.clauses.end() && (it->getSize() < 2) ; it++) {
-			if (it.getSize() == 0) break;
+		for (auto it = f.formula_.begin(); it != f.formula_.end() && (it->getSize() < 2) ; it++) {
+			if (it->getSize() == 0) break;
 			unitVariable = it->getVar();
-			assert(i != 0 && "0 IS NOT A VALID VARIABLE"); // getVar returns 0 on getVar for empty formula;
+			assert(unitVariable != 0 && "0 IS NOT A VALID VARIABLE"); // getVar returns 0 on getVar for empty formula;
 			if (!assignments.count(unitVariable)) {
 				if (unitVariable < 0) { assignments[-unitVariable] = false; }
-				else { assignments[unitVaraible] = true; } 
-			} else if ((map[abs(unitVariable)] == true && unitVariable < 0) || (map[abs(unitVariable)] == false && unitVariable > 0) ) { throw 10; }
-			else {
+				else { assignments[unitVariable] = true; } 
+			} else if ((assignments[abs(unitVariable)] == true && unitVariable < 0) || (assignments[abs(unitVariable)] == false && unitVariable > 0) ) { 
+				throw 10; 
+			} else {
 				it->variables.clear();					
 				it->setAutoValid(true);	
 			}
@@ -85,7 +83,7 @@ namespace sat {
 	}
 
 	bool isDNFSat(formula &f) {
-		for (auto c: formula) { if (c.isDNFSat()) return true; }
+		for (auto c: f.formula_) { if (c.isDNFSat()) return true; }
 		return false;
 	}
 
@@ -93,10 +91,10 @@ namespace sat {
 		std::map<int,bool> assignments;
 		try {
 			CNFSimplify(f);
-			assignments = f.PLP();
+			assignments = PLP(f);
 			propUnitClauses(assignments,f);
 			if (!f.validAssignment(assignments)) return false;
-			else if (f.completeAssignment(assignments) return true;
+			else if (f.completeAssignment(assignments)) return true;
 			return DPLLInner(f,assignments);
 		} catch (int err) { // If an error is thrown in DPLLInner it'll be caught here .. eh
 			 if (err == 10) return false;
@@ -112,21 +110,19 @@ namespace sat {
  	 * since it's not a requirement of DPLL, we only do it off the bat, just
  	 * in case we can clean up the formula quickly.
      	 */
-	bool DPLLInner(formula &f, map<int,bool> &assignments) {
-		propUnitClauses(f,assignments); 			// Propogate all unit clauses
+	bool DPLLInner(formula &f, std::map<int,bool> &assignments) {
+		propUnitClauses(assignments,f); 			// Propogate all unit clauses
 		f.simplifyExpression(assignments); 			// Simplify this formula
 		if (!f.validAssignment(assignments)) return false; 	// If there's a conflict, this branch ends here
 		if (f.completeAssignment(assignments)) return true; 	// If there's a satisfying assignment (we don't 
 									// need all variables) return true.
 		formula newForm(f);
-		map<int,bool> updatedAssignments(assignments);		// Copy CTORs probably eat a lot of resources
+		std::map<int,bool> updatedAssignments(assignments);		// Copy CTORs probably eat a lot of resources
 		int var = newForm.getVariable();
 		updatedAssignments[var] = true;				// This the decision section
 		if (DPLLInner(newForm,updatedAssignments)) return true;
 		updatedAssignments[var] = false;	
-		if (DPLLINnner(newForm,updatedAssignments)) return true;
+		if (DPLLInner(newForm,updatedAssignments)) return true;
 		return false; // If setting variable either way returns false, return false.
 	}	
 };
-
-#endif

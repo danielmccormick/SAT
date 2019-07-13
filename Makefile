@@ -1,5 +1,5 @@
 FLAGS = -std=c++14 -Wall -Wextra
-FILES = source/formula.* source/sat.cc
+FILES = source/formula.hh source/formula.cc source/sat.cc
 COMPILER = g++
 
 lib:
