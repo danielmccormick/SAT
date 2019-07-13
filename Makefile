@@ -1,5 +1,5 @@
 FLAGS = -std=c++14 -Wall -Wextra
-FILES = source/sat.*
+FILES = source/formula.* source/sat.cc
 
 lib:
 	g++ -shared -fpic $(FILES)  -o sat.so $(FLAGS)

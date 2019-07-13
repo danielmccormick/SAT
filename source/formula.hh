@@ -23,26 +23,25 @@ namespace sat {
 			// valid assignment for cnf only - to see if it's DNF sat use isDNFSat()
 			bool validAssignment(const std::map<int,bool> &);
 			
-			// is DNF Sat only - this is a lot cheaper to implement
-			bool isDNFSat() { return (!shortResolve); }
-
 			// This is a bit cryptic, but it will return true if and only if it is lways sat (ie got simplified\);
-			bool isCNFSat() { return (shortResolve || autoValid ); }
+			bool isCNFSat() { return (autoValid); }
 			
 			// For unit clause propogation
-			bool isUnitClause() { return (variables.size() == 1); }
-
-			int getFirstVar() { if (isUnitClause() {return *(variables.begin()); } else return 0; } 
+			bool isUnitClause() { return ( getSize() == 1); }
 
 			// only call getVariable() if not sat, since otherwise it's meaningless
-			int getVariable() { if (variables.size()) return abs(*variables.begin());}
+			int getVar() { if (variables.size()) return *variables.begin(); return 0;}
 	
 			// Don't bother simplifying DNF formulas
 			void simplifyClause(const std::map<int,bool> &);
+
+			int getSize() { return variables.size(); }
 								
+			std::set<int> variables; // If anyone really wants to touch the variables, they can
+
+			void tryClear();
+			void setAutoValid(const bool b) { autoValid = b; }
 		private: 
-			std::set<int> variables;
-			bool shortResolve; // A & Not A
 			bool autoValid;
 	};
 
@@ -66,10 +65,10 @@ namespace sat {
 			void handleError(int);
 
 			// Do pure logic propogation
-			friend std::map<int,bool> PLP(const formula &);			
+			friend std::map<int,bool> PLP(formula &);			
 
 			// Propogate Unit Clauses
-			friend void propUnitClauses(std::map<int,bool> &, const formula &);
+			friend void propUnitClauses(std::map<int,bool> &, formula &);
 
 			
 
