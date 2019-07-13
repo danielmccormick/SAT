@@ -24,7 +24,7 @@ namespace sat {
 			bool validAssignment(const std::map<int,bool> &);
 			
 			// This is a bit cryptic, but it will return true if and only if it is lways sat (ie got simplified\);
-			bool isCNFSat() { return (autoValid); }
+			bool isCNFSat();
 			
 			// For unit clause propogation
 			bool isUnitClause() { return ( getSize() == 1); }
@@ -70,7 +70,11 @@ namespace sat {
 			// Propogate Unit Clauses
 			friend void propUnitClauses(std::map<int,bool> &, formula &);
 
+			friend bool isDNFSat(formula &) const;
 			
+			friend bool DPLLSat(formula &f);
+
+			friend bool DPLLInner(formula &f, std::map<int,bool> &);			
 
 		private:
 			// Returns false if the assignment is neccesarily false

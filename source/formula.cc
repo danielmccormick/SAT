@@ -14,6 +14,15 @@ namespace sat {
 		return;				
 	}
 
+	bool clause::isDNFSat() {
+		std::set<int> s;
+		for (auto i : variables) {
+			if (s.count(-i)) return false;
+			else (s.insert(i));
+		}
+		return true;
+	}
+
 	bool clause::validAssignment(const std::map<int,bool> &assignments) {
 		if ( isCNFSat() ) { return true; }
 		if ( variables.empty() ) { return false; } 

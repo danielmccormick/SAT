@@ -61,6 +61,11 @@ namespace sat {
 		}
 		return;
 	}
+
+	bool isSat(formula &f) {
+		if (f.getDNF()) return f.isDNFSat();
+		else return f.DPLLSat(f);
+	}
 }
 
 
