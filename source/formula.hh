@@ -60,6 +60,8 @@ namespace sat {
 
 			void clear();	
 
+			void simplifyExpression(std::map<int,bool> &);
+
 			// Do pure logic propogation
 			friend std::map<int,bool> PLP(formula &);			
 

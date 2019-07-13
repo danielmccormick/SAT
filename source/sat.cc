@@ -15,12 +15,30 @@
 #define CLAUSE_SIZE_COMP [](clause a, clause b) -> bool { return a.getSize() > b.getSize(); } 
 
 namespace sat {
+	
+	void CNFSimplify(formula &f) {
+		for (auto c : f.formula_) {
+			std::set<int> vars;
+			for (auto i : c) {
+				if (vars.count(-i)) {
+					c.clear();
+					vars.clear();
+					c.setAutoValid(true);
+					break;
+				} else {
+					vars.insert(i);
+				}
+			}
+			vars.clear();
+		}
+		return;
+	}
 
-	std::map<int,bool> PLP(formula &f) {		
+	std::map<int,bool> PLP(formula &form) {		
 		std::set<int> pureLiterals;
 		std::set<int> removedLiterals;
 		
-		for (auto f: formula_) {
+		for (auto f: f.formula_) {
 			for(int i : f.variables) {
 				if (!(removedLiterals.count(abs(i)))) {
 					if (pureLiterals.count(-i) {
@@ -76,20 +94,23 @@ namespace sat {
 	bool DPLLSat(formula &f) {
 		std::map<int,bool> assignments;
 		try {
+			CNFSimplify(f);
 			assignments = f.PLP();
 			propUnitClauses(assignments,f);
 			if (!f.validAssignment(assignments)) return false;
 			else if (f.completeAssignment(assignments) return true;
 			return DPLLInner(f,assignments);
-		} catch (int err) {
+		} catch (int err) { // If an error is thrown in DPLLInner it'll be caught here .. eh
 			 if (err == 10) return false;
 			 else (handleError(err));
 			 return false;
-		}
-	
+		}	
 	}
 
 	bool DPLLInner(formula &f, map<int,bool> &assignments) {
+		propUnitClauses(f,assignments);
+		if (!f.validAssignment(assignments)) return false;
+		
 
 	}
 	
