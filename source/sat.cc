@@ -107,13 +107,28 @@ namespace sat {
 		}	
 	}
 
+	/*
+ 	 * So we aren't doing pure literal propogation, but it could be useful
+	 * An O(n) algorithm being done 2^n times sounds very expensive though
+	 * so I'm unsure if it'd have a performance increase. In meantime,
+ 	 * since it's not a requirement of DPLL, we only do it off the bat, just
+ 	 * in case we can clean up the formula quickly.
+     	 */
 	bool DPLLInner(formula &f, map<int,bool> &assignments) {
-		propUnitClauses(f,assignments);
-		if (!f.validAssignment(assignments)) return false;
-		
-
-	}
-	
+		propUnitClauses(f,assignments); 			// Propogate all unit clauses
+		f.simplifyExpression(assignments); 			// Simplify this formula
+		if (!f.validAssignment(assignments)) return false; 	// If there's a conflict, this branch ends here
+		if (f.completeAssignment(assignments)) return true; 	// If there's a satisfying assignment (we don't 
+									// need all variables) return true.
+		formula newForm(f);
+		map<int,bool> updatedAssignments(assignments);		// Copy CTORs probably eat a lot of resources
+		int var = newForm.getVariable();
+		updatedAssignments[var] = true;				// This the decision section
+		if (DPLLInner(newForm,updatedAssignments)) return true;
+		updatedAssignments[var] = false;	
+		if (DPLLINnner(newForm,updatedAssignments)) return true;
+		return false; // If setting variable either way returns false, return false.
+	}	
 }
 
 #endif
