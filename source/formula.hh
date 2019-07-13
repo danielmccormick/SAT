@@ -23,8 +23,8 @@ namespace sat {
 			// valid assignment for cnf only - to see if it's DNF sat use isDNFSat()
 			bool validAssignment(const std::map<int,bool> &);
 			
-			// This is a bit cryptic, but it will return true if and only if it is lways sat (ie got simplified\);
-			bool isCNFSat();
+			// Only meaningful in short circuit
+			bool isCNFSat() { return autoValid; }
 			
 			// For unit clause propogation
 			bool isUnitClause() { return ( getSize() == 1); }

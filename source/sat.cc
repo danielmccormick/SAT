@@ -25,9 +25,7 @@ namespace sat {
 					vars.clear();
 					c.setAutoValid(true);
 					break;
-				} else {
-					vars.insert(i);
-				}
+				} else { vars.insert(i); }
 			}
 			vars.clear();
 		}

@@ -1,11 +1,17 @@
 #include "formula.hh"
-#include <memory>
+#include <set>
+#include <vector>
+#include <map>
+#include <fstream>
+#include <algorithm>
+#include <iostream>
+#include <cassert>
+
 #define ABS_INT_COMP [](int a, int b) -> bool { return abs(a) > abs(b); }
 
 namespace sat {
 	
 	clause::clause(const std::vector<int> &vec) {
-		shortResolve = false;
 		autoValid = false;
 		for (auto i : vec) {
 			if (variables.count(-i)) { shortResolve = true; }
@@ -14,34 +20,51 @@ namespace sat {
 		return;				
 	}
 
-	bool clause::isDNFSat() {
-		std::set<int> s;
-		for (auto i : variables) {
-			if (s.count(-i)) return false;
-			else (s.insert(i));
-		}
-		return true;
-	}
-
 	bool clause::validAssignment(const std::map<int,bool> &assignments) {
 		if ( isCNFSat() ) { return true; }
 		if ( variables.empty() ) { return false; } 
 		for (auto i : variables) { /// Needs only one example
+			assert(i != 0 && "0 IS NOT A VALID VARIABLE"); 
+			if (assignments.count(abs(i))) {
+				if ( (assignments.find(abs(i)))->second == true && i > 0) return true;
+				if ( (assignments.find(abs(i)))->second == false && i < 0) return true;	
+			} else { return true; }
+		}
+		return false; // No unassigned or correctly assigned variables
+	}
+
+	/*
+	 * The key difference between valid and complete
+	 * is that an unassigned variable does not satisfy
+	 * complete. This is because complete implies we're done
+  	 */ 
+
+	bool clause::completeAssignment(const std::map<int,bool> &assignments) {
+		if ( isCNFSat() ) { return true; }
+		if ( variables.empty() ) { return false; } 
+		for (auto i : variables) { /// Needs only one example
+			assert(i != 0 && "0 IS NOT A VALID VARIABLE"); 
 			if (assignments.count(abs(i))) {
 				if ( (assignments.find(abs(i)))->second == true && i > 0) return true;
 				if ( (assignments.find(abs(i)))->second == false && i < 0) return true;	
 			}
 		}
 		return false;
+
 	}
 
 	void clause::simplifyClause(const std::map<int,bool> &assignments) {
 		for (auto i : variables) {
 			if (assignments.count(abs(i))) {
+				assert(i != 0 && "0 IS NOT A VALID VARIABLE"); 
 				if ( (assignments.find(abs(i)))->second == true && i > 0) {
 					autoValid = true;
+					variables.clear();
+					return;
 				} else if ( (assignments.find(abs(i)))->second == false && i < 0) {
 					autoValid = true;
+					variables.clear();
+					return;
 				}
 				variables.erase(i);
 			}
@@ -117,67 +140,12 @@ namespace sat {
 		throw 2;
 	}
 
-	std::map<int,bool> formula::PLP() {
-		std::map<int,bool> assignments;
-		for (auto i : pureLiterals) {
-			if (i < 0) assignments[abs(i)] = false;
-			else assignments[abs(i)] = true;
-		}
-		return assignments;
+	void formula::simplifyExpression(const std::map<int,bool> &variables) {
+		for (auto c : formula_) { c.simplifyClause(variables); }
+		return;
 	}
 
-	bool formula::isDNFSat() const{
-		for (auto c : formula_) {
-			if (c.isCNFSat()) return true;
-		}
-		return false;
-	}
-
-	void formula::propUnitClauses(std::map<int,bool> &assignments) {
-		for 
-	}
-
-	bool DPLLSat(formula &f) {
-		std::map<int,bool> assignments;
-		try {
-			assignments = f.PLP();
-		} catch (int err) { 
-			handleError(err);
-			return false;	
-		}
-		try {
-			formula f_(f);
-			f_.simplifyFormula(assignments)
-		
-		} catch (int err) {
-			if (err == -1) return false;
-			else handleError(err);
-			return false;
-		}
-		return false;
-	}
-
-	bool DPLLInner(formula f, std::map<int,bool> assignments) {
-		// TBD
-	}
-
-	bool CDCLSat(formula &f) {
-		return false;
-	}
-
-	bool CDCLInner(formula f, std::map<int,bool> assignments) {
-		return false;
-	}
-
-	bool DNFSat(const formula &f) {
-		return f.isDNFSat(); // Just to allow consisteny evaluation
-	}
-
-	bool formula::simplifyFormula(const std::map<int,bool> &variables) {
-		return false;
-	}
-
-	void formula::handleError(int i) {
+	void handleError(int i) {
 		switch(i) {
 			case 0: std::cout << "An error has occured! Invalid File\n";
 				break;
@@ -202,7 +170,6 @@ namespace sat {
 
 	void formula::clear() {
 		formula_.clear();
-		pureLiterals.clear();
 		variables.clear();
 	}
 
