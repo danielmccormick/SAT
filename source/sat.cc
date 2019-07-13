@@ -119,8 +119,8 @@ namespace sat {
 	std::map<int,bool> formula::PLP() {
 		std::map<int,bool> assignments;
 		for (auto i : pureLiterals) {
-			if (i < 0) assignments[-i] = false;
-			else assignments[i] = true;
+			if (i < 0) assignments[abs(i)] = false;
+			else assignments[abs(i)] = true;
 		}
 		return assignments;
 	}
@@ -132,10 +132,21 @@ namespace sat {
 		return false;
 	}
 
+	void formula::propUnitClauses(std::map<int,bool> &assignments) {
+		for 
+	}
+
 	bool DPLLSat(formula &f) {
-		auto assignments = f.PLP();
+		std::map<int,bool> assignments;
 		try {
-					
+			assignments = f.PLP();
+		} catch (int err) { 
+			f.handleError(err);
+			return false;	
+		}
+		try {
+			formula f_(f);
+			f_.simplifyFormula(assignments)
 		
 		} catch (int err) {
 			if (err == -1) return false;
@@ -179,7 +190,7 @@ namespace sat {
 				break;
 			case 5: std::cout << "An error has occured! Reached end of evaluating clause with no decision\n";
 				break;
-
+			case 6: break; // Reserve
 			default: 
 				std::cout << "An error has occured! Error Code: " << i << "\n";
 				break;

@@ -32,13 +32,14 @@ namespace sat {
 			// For unit clause propogation
 			bool isUnitClause() { return (variables.size() == 1); }
 
+			int getFirstVar() { if (isUnitClause() {return *(variables.begin()); } else return 0; } 
+
 			// only call getVariable() if not sat, since otherwise it's meaningless
 			int getVariable() { if (variables.size()) return abs(*variables.begin());}
 	
 			// Don't bother simplifying DNF formulas
 			void simplifyClause(const std::map<int,bool> &);
-			
-					
+								
 		private: 
 			std::set<int> variables;
 			bool shortResolve; // A & Not A
@@ -58,14 +59,20 @@ namespace sat {
 
 			bool validAssignment(const std::map<int,bool> &assignments);
 
-			// Do pure logic propogation
-			std::map<int,bool> PLP();			
-
 			void clear();	
 
 			bool isDNFSat() const;
 
 			void handleError(int);
+
+			// Do pure logic propogation
+			friend std::map<int,bool> PLP(const formula &);			
+
+			// Propogate Unit Clauses
+			friend void propUnitClauses(std::map<int,bool> &, const formula &);
+
+			
+
 		private:
 			// Returns false if the assignment is neccesarily false
 			bool validClause(const std::map<int,bool> &assignments, int clauseNum);
