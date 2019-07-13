@@ -60,20 +60,18 @@ namespace sat {
 
 			void clear();	
 
-			bool isDNFSat() const;
-
-			void handleError(int);
-
 			// Do pure logic propogation
 			friend std::map<int,bool> PLP(formula &);			
 
 			// Propogate Unit Clauses
 			friend void propUnitClauses(std::map<int,bool> &, formula &);
-
+			// is DNF Sat - small function
 			friend bool isDNFSat(formula &) const;
-			
-			friend bool DPLLSat(formula &f);
 
+			friend void CNFSimplify(formula &);
+
+			// Will 
+			friend bool DPLLSat(formula &f);
 			friend bool DPLLInner(formula &f, std::map<int,bool> &);			
 
 		private:
@@ -94,17 +92,16 @@ namespace sat {
 
 			std::vector<clause> formula_;	
 			
-			std::set<int> pureLiterals; // For PLP, reserved for future use
 			std::set<int> variables;
 	};
 
-	bool DPLLSat(formula &);
-	bool DPLLInner(formula,std::map<int,bool>);
+	/* Reserved for future development
+	 *	bool CDCLSat(formula &);
+ 	 *	bool CDCLInner(formula, std::map<int,bool>);
+	 */
 
-	bool CDCLSat(formula &);
-	bool CDCLInner(formula, std::map<int,bool>);
+	void handleError(int);
 
-	bool DNFSat(const formula &);
 };
 
 #endif

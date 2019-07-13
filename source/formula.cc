@@ -75,15 +75,7 @@ namespace sat {
 						{
 							std::vector<int> parsedClause = parseClause(l);
 							clauseFound = true;
-							for (auto i : parsedClause) {
-								if (!notPureLiterals->count(abs(i))) {
-									if (pureLiterals.count(-i)) {
-										pureLiterals.erase(-i);
-										notPureLiterals->insert(abs(i));
-									} else { pureLiterals.insert(i); }
-								}
-								variables.insert(abs(i));
-							}
+							for (auto i : parsedClause) { variables.insert(abs(i)); }
 							formula_.push_back(clause(parsedClause));
 						}
 					}					
@@ -150,7 +142,7 @@ namespace sat {
 		try {
 			assignments = f.PLP();
 		} catch (int err) { 
-			f.handleError(err);
+			handleError(err);
 			return false;	
 		}
 		try {
@@ -159,7 +151,7 @@ namespace sat {
 		
 		} catch (int err) {
 			if (err == -1) return false;
-			else f.handleError(err);
+			else handleError(err);
 			return false;
 		}
 		return false;

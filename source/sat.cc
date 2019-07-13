@@ -15,6 +15,7 @@
 #define CLAUSE_SIZE_COMP [](clause a, clause b) -> bool { return a.getSize() > b.getSize(); } 
 
 namespace sat {
+
 	std::map<int,bool> PLP(formula &f) {		
 		std::set<int> pureLiterals;
 		std::set<int> removedLiterals;
@@ -63,11 +64,35 @@ namespace sat {
 	}
 
 	bool isSat(formula &f) {
-		if (f.getDNF()) return f.isDNFSat();
-		else return f.DPLLSat(f);
+		if (f.getDNF()) return isDNFSat(f);
+		else return DPLLSat(f);
 	}
+
+	bool isDNFSat(formula &f) {
+		for (auto c: formula) { if (c.isDNFSat()) return true; }
+		return false;
+	}
+
+	bool DPLLSat(formula &f) {
+		std::map<int,bool> assignments;
+		try {
+			assignments = f.PLP();
+			propUnitClauses(assignments,f);
+			if (!f.validAssignment(assignments)) return false;
+			else if (f.completeAssignment(assignments) return true;
+			return DPLLInner(f,assignments);
+		} catch (int err) {
+			 if (err == 10) return false;
+			 else (handleError(err));
+			 return false;
+		}
+	
+	}
+
+	bool DPLLInner(formula &f, map<int,bool> &assignments) {
+
+	}
+	
 }
-
-
 
 #endif
