@@ -1,4 +1,4 @@
-#include "sat.hh"
+#include "formula.hh"
 
 #include <iostream>
 
@@ -13,7 +13,7 @@ int main(int argc, int **argv) {
 		sat::formula dimacsFormula;
 		for (unsigned int i = 1; i < argc; i++) {
 			dimacsFormula.readFromFile(argv[i]);
-			if (sat::isDPLLSat(dimacsFormula)) { cout << "SAT\n"; }
+			if (sat::isSat(dimacsFormula)) { cout << "SAT\n"; }
 			else { cout << "UNSAT\n"; }
 			dimacsFormula.clear();
 		}

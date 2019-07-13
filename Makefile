@@ -6,7 +6,7 @@ lib:
 	$(COMPILER) -shared -fpic $(FILES)  -o sat.so $(FLAGS)
 
 bin:
-	$(COMPILER) main.cc sat.cc sat.hh -o ./satSolver.o $(FLAGS) -O3
+	$(COMPILER) $(FILES) source/main.cc -o ./satSolver.o $(FLAGS) -O3
 
 .PHONY: clean
 clean: 
