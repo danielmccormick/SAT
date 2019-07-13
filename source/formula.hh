@@ -22,6 +22,7 @@ namespace sat {
 
 			// valid assignment for cnf only - to see if it's DNF sat use isDNFSat()
 			bool validAssignment(const std::map<int,bool> &);
+			bool completeAssignment(const std::map<int,bool> &);
 			
 			// Only meaningful in short circuit
 			bool isCNFSat() { return autoValid; }
@@ -60,7 +61,11 @@ namespace sat {
 
 			void clear();	
 
-			void simplifyExpression(std::map<int,bool> &);
+			void simplifyExpression(const std::map<int,bool> &);
+
+			// Takes the assignments 
+			bool validAssignment(std::map<int,bool> &);			
+			bool completeAssignment(std::map<int,bool> &);
 
 			// Do pure logic propogation
 			friend std::map<int,bool> PLP(formula &);			
@@ -68,7 +73,7 @@ namespace sat {
 			// Propogate Unit Clauses
 			friend void propUnitClauses(std::map<int,bool> &, formula &);
 			// is DNF Sat - small function
-			friend bool isDNFSat(formula &) const;
+			friend bool isDNFSat(formula &);
 
 			friend void CNFSimplify(formula &);
 

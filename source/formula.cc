@@ -14,7 +14,7 @@ namespace sat {
 	clause::clause(const std::vector<int> &vec) {
 		autoValid = false;
 		for (auto i : vec) {
-			if (variables.count(-i)) { shortResolve = true; }
+			if (variables.count(-i)) { setAutoValid(true); }
 			variables.insert(i);
 		}
 		return;				
@@ -83,7 +83,6 @@ namespace sat {
 			bool clauseFound = false;	
 			std::string l;
 			try {
-				std::unique_ptr<std::set<int>> notPureLiterals = std::make_unique<std::set<int>>();
 				while (getline(file,l)) {
 					if (l.empty()) { throw 0; }
 					else if (l[0] == 'c') { }
@@ -145,6 +144,25 @@ namespace sat {
 		return;
 	}
 
+	void formula::clear() {
+		formula_.clear();
+		variables.clear();
+	}
+
+	bool formula::validAssignment(std::map<int,bool> &variables) {
+		for (auto c: formula_) {
+			if (!(c.validAssignment(variables))) return false;
+		}
+		return true;
+	}
+
+	bool formula::completeAssignment(std::map<int,bool> &variables) {
+		for (auto c: formula_) {
+			if (!(c.completeAssignment(variables))) return false;
+		}
+		return true;
+	}
+
 	void handleError(int i) {
 		switch(i) {
 			case 0: std::cout << "An error has occured! Invalid File\n";
@@ -168,9 +186,5 @@ namespace sat {
 		return;
 	}
 
-	void formula::clear() {
-		formula_.clear();
-		variables.clear();
-	}
 
 } ;

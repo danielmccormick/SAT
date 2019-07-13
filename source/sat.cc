@@ -127,6 +127,6 @@ namespace sat {
 		if (DPLLINnner(newForm,updatedAssignments)) return true;
 		return false; // If setting variable either way returns false, return false.
 	}	
-}
+};
 
 #endif
