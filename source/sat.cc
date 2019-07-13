@@ -25,7 +25,9 @@ namespace sat {
 					vars.clear();
 					c.setAutoValid(true);
 					break;
-				} else { vars.insert(i); }
+				} else { 
+					vars.insert(i);
+				}
 			}
 			vars.clear();
 		}
@@ -68,10 +70,8 @@ namespace sat {
 			if (!assignments.count(unitVariable)) {
 				if (unitVariable < 0) { assignments[-unitVariable] = false; }
 				else { assignments[unitVaraible] = true; } 
-			} else if ( 	(map[abs(unitVariable)] == true && unitVariable < 0) ||
-					(map[abs(unitVariable)] == false && unitVariable > 0) ) {
-				throw 10;
-			} else {
+			} else if ((map[abs(unitVariable)] == true && unitVariable < 0) || (map[abs(unitVariable)] == false && unitVariable > 0) ) { throw 10; }
+			else {
 				it->variables.clear();					
 				it->setAutoValid(true);	
 			}
