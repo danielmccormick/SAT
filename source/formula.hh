@@ -4,6 +4,7 @@
 #include <fstream>
 #include <algorithm>
 #include <iostream>
+#define DEBUG 0
 
 namespace sat {
 	inline bool isNum(const char &c) { return (c >= '0' && c <= '9'); }
@@ -54,11 +55,13 @@ namespace sat {
 			bool getDNF() { return DNF; }
 			void setDNF(const bool &DNF_) { DNF = DNF_; } 
 
-			bool readFromFile(const char * &file_path);
+			bool readFromFile(const char *file_path);
 
 			bool validAssignment(const std::map<int,bool> &assignments);
 
 			void clear();	
+
+			void dumpFormula();
 
 			void simplifyExpression(const std::map<int,bool> &);
 

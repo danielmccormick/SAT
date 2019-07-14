@@ -1,4 +1,4 @@
-#include "formula.hh"
+#include "formula.cc"
 
 #include <set>
 #include <vector>
@@ -8,8 +8,8 @@
 #include <iostream>
 #include <cassert>
 
-#define ABS_INT_COMP [](int a, int b) -> bool { return abs(a) > abs(b); }
-#define CLAUSE_SIZE_COMP [](clause a, clause b) -> bool { return a.getSize() > b.getSize(); } 
+#define ABS_INT_COMP [](int a, int b) -> bool { return abs(a) < abs(b); }
+#define CLAUSE_SIZE_COMP [](clause a, clause b) -> bool { return a.getSize() < b.getSize(); } 
 
 namespace sat {
 	
@@ -49,6 +49,7 @@ namespace sat {
 		}
 		std::map<int,bool> assignments;
 		for (int i : pureLiterals) {
+			std::cout << "Assigning i : " <<  i << "\n";
 			assert(i != 0 && "0 IS NOT A VALID VARIABLE"); 
 			if (i < 0) { assignments[-i] = false; }
 			else { assignments[i] = true; }
@@ -111,17 +112,27 @@ namespace sat {
  	 * in case we can clean up the formula quickly.
      	 */
 	bool DPLLInner(formula &f, std::map<int,bool> &assignments) {
+		//dumpMap(assignments);
+		f.dumpFormula();
+		f.simplifyExpression(assignments);
 		propUnitClauses(assignments,f); 			// Propogate all unit clauses
 		f.simplifyExpression(assignments); 			// Simplify this formula
+		f.dumpFormula();
 		if (!f.validAssignment(assignments)) return false; 	// If there's a conflict, this branch ends here
 		if (f.completeAssignment(assignments)) return true; 	// If there's a satisfying assignment (we don't 
 									// need all variables) return true.
 		formula newForm(f);
 		std::map<int,bool> updatedAssignments(assignments);		// Copy CTORs probably eat a lot of resources
+
+		dumpMap(updatedAssignments);
 		int var = newForm.getVariable();
-		updatedAssignments[var] = true;				// This the decision section
+		std::cout << "New Var Acquired: " << var << "\n";
+		assert(!updatedAssignments.count(abs(var)) && "Reusing variable??");
+
+		updatedAssignments[abs(var)] = true;				// This the decision section
 		if (DPLLInner(newForm,updatedAssignments)) return true;
-		updatedAssignments[var] = false;	
+
+		updatedAssignments[abs(var)] = false;	
 		if (DPLLInner(newForm,updatedAssignments)) return true;
 		return false; // If setting variable either way returns false, return false.
 	}	
